@@ -23,7 +23,7 @@ public class AppConfiguration {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    public static final Logger logger = LoggerFactory.getLogger(AppConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppConfiguration.class);
 
     @Bean(name = "data")
     List<CsvData> getCsvData() throws IOException {
