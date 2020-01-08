@@ -5,6 +5,8 @@ import com.example.bcs.server.demo.dto.AccountDto;
 import com.example.bcs.server.demo.entity.Account;
 import com.example.bcs.server.demo.exception.AccountNotFoundException;
 import com.example.bcs.server.demo.repository.AccountsRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.VndErrors;
@@ -31,6 +33,8 @@ public class AccountController {
     @Autowired
     private AccountConverter accountConverter;
 
+    private static final Logger logger = LoggerFactory.getLogger(AccountConverter.class);
+
     @RequestMapping(method = RequestMethod.OPTIONS)
     ResponseEntity<?> getOptions() {
         return ResponseEntity.ok().allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS).build();
@@ -38,6 +42,7 @@ public class AccountController {
 
     @GetMapping
     Collection<AccountDto> getAllAccounts() {
+        logger.info("Get All Accounts request");
         return accountsRepository
                 .findAll()
                 .stream()
@@ -47,6 +52,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) throws AccountNotFoundException {
+        logger.info("Getting account: id = " + id);
         return accountsRepository
                 .findById(id)
                 .map(e -> accountConverter.convertToDto(e))
@@ -54,13 +60,9 @@ public class AccountController {
                 .orElseThrow(() -> new AccountNotFoundException(id));
     }
 
-    /**
-     *
-     * @param account
-     * @return
-     */
     @PostMapping
     ResponseEntity<AccountDto> postNewAccount(@Valid @RequestBody AccountDto account) {
+        logger.info("POST new account: " + account);
         Account accountEntity = accountConverter.convertToEntity(account);
         accountEntity.setCreateDateTime(LocalDateTime.now());
         Account savedAccount = accountsRepository.save(accountEntity);
@@ -73,12 +75,14 @@ public class AccountController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        logger.info("Deleting account: id = " + id);
         accountsRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto account) throws AccountNotFoundException {
+        logger.info("Updating account: id = " + id + "; with data: " + account);
         return accountsRepository.findById(id).map(e -> {
             Account accountEntity = accountConverter.convertToEntity(account);
             accountEntity.setCreateDateTime(LocalDateTime.now());
@@ -91,7 +95,8 @@ public class AccountController {
 
     @ExceptionHandler(AccountNotFoundException.class)
     ResponseEntity<VndErrors.VndError> accountNotFoundError(AccountNotFoundException e) {
-        return new ResponseEntity<>(new VndErrors.VndError("Account ID: " + e.getAccountId().toString(), e.getMessage(),
+        logger.info("Account not found: id = " + e.getAccountId());
+        return new ResponseEntity<>(new VndErrors.VndError("Account ID: " + e.getAccountId(), e.getMessage(),
                 new Link(ServletUriComponentsBuilder.fromCurrentRequest().toUriString())), HttpStatus.NOT_FOUND);
     }
 

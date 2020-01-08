@@ -53,4 +53,13 @@ public class Account {
         this.email = email;
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", createDateTime=" + createDateTime +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
