@@ -16,7 +16,7 @@ public class AccountDto {
     private String createdAt;
 
     @NotEmpty(message = "Account email is not provided")
-    @Email
+    @Email(message = "Invalid email")
     private String email;
 
     public AccountDto() {
