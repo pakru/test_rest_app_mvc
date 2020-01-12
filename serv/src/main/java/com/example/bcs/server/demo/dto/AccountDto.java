@@ -2,39 +2,35 @@ package com.example.bcs.server.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 public class AccountDto {
 
-    private Long id;
-
     @NotEmpty(message = "Account name is not provided")
     private String name;
-
-    @JsonProperty("created_at")
-    private String createdAt;
 
     @NotEmpty(message = "Account email is not provided")
     @Email(message = "Invalid email")
     private String email;
 
-    public AccountDto() {
-    }
+    @JsonProperty("phone_number")
+    @NotEmpty(message = "Phone number is not provided")
+    @Digits(message = "Phone number should contain digits only", integer = 11, fraction = 0)
+    private String phoneNumber;
 
-    public AccountDto(long id, String name, String createdAt, String email) {
-        this.id = id;
+    private String address;
+
+
+    public AccountDto(@NotEmpty(message = "Account name is not provided") String name,
+                      @NotEmpty(message = "Account email is not provided") @Email(message = "Invalid email") String email,
+                      @NotEmpty(message = "Phone number is not provided") @Digits(message = "Phone number should contain digits only", integer = 11, fraction = 0) String phoneNumber,
+                      String address) {
         this.name = name;
-        this.createdAt = createdAt;
         this.email = email;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
     }
 
     public String getName() {
@@ -45,14 +41,6 @@ public class AccountDto {
         this.name = name;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -61,13 +49,29 @@ public class AccountDto {
         this.email = email;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "AccountDto{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", createdAt='" + createdAt + '\'' +
+                "name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
                 '}';
     }
 }

@@ -1,3 +1,7 @@
-name,email
-Ben,ben@mail.com
-Melony,melony@mail.com
+name,email,phone_number,address
+Ben,ben@mail.com,79101002030,Novosibirsk
+Melony,melony@mail.com,79201002030,Moscow
+Jack,jack@mail.com,79301002030,Saint-Petersburg
+Antony,antony@mail.com,79401002030,Kazan
+Paul,paul@mail.com,79501002030,Perm
+Ann,ann@mail.com,79601002030,Vladivostok

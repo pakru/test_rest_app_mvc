@@ -1,5 +1,7 @@
 package com.example.bcs.server.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -14,9 +16,16 @@ public class Account {
     private String name;
 
     @Column(name = "created_at")
+    @JsonProperty("created_at")
     private LocalDateTime createDateTime;
 
     private String email;
+
+    @Column(name = "phone_number")
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+
+    private String address;
 
     public Account() {
     }
@@ -53,6 +62,22 @@ public class Account {
         this.email = email;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "Account{" +
@@ -60,6 +85,8 @@ public class Account {
                 ", name='" + name + '\'' +
                 ", createDateTime=" + createDateTime +
                 ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
                 '}';
     }
 }

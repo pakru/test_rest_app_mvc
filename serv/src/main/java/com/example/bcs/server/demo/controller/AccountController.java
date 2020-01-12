@@ -8,6 +8,7 @@ import com.example.bcs.server.demo.repository.AccountsRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpMethod;
@@ -21,7 +22,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accounts")
@@ -41,27 +41,22 @@ public class AccountController {
     }
 
     @GetMapping
-    Collection<AccountDto> getAllAccounts() {
+    Collection<Account> getAllAccounts() {
         logger.info("Get All Accounts request");
-        return accountsRepository
-                .findAll()
-                .stream()
-                .map(e -> accountConverter.convertToDto(e))
-                .collect(Collectors.toList());
+        return accountsRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) throws AccountNotFoundException {
+    ResponseEntity<Account> getAccountById(@PathVariable Long id) throws AccountNotFoundException {
         logger.info("Getting account: id = " + id);
         return accountsRepository
                 .findById(id)
-                .map(e -> accountConverter.convertToDto(e))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new AccountNotFoundException(id));
     }
 
     @PostMapping
-    ResponseEntity<AccountDto> postNewAccount(@Valid @RequestBody AccountDto account) {
+    ResponseEntity<Account> postNewAccount(@Valid @RequestBody AccountDto account) {
         logger.info("POST new account: " + account);
         Account accountEntity = accountConverter.convertToEntity(account);
         accountEntity.setCreateDateTime(LocalDateTime.now());
@@ -70,7 +65,7 @@ public class AccountController {
         URI uri =
                 MvcUriComponentsBuilder.fromController(getClass()).path("/{id}").buildAndExpand(savedAccount.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(accountConverter.convertToDto(savedAccount));
+        return ResponseEntity.created(uri).body(savedAccount);
     }
 
     @DeleteMapping("/{id}")
@@ -81,7 +76,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto account) throws AccountNotFoundException {
+    ResponseEntity<Account> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto account) throws AccountNotFoundException {
         logger.info("Updating account: id = " + id + "; with data: " + account);
         return accountsRepository.findById(id).map(e -> {
             Account accountEntity = accountConverter.convertToEntity(account);
@@ -89,7 +84,7 @@ public class AccountController {
             accountEntity.setId(id);
             Account updatedAccount = accountsRepository.save(accountEntity);
             URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
-            return ResponseEntity.created(uri).body(accountConverter.convertToDto(updatedAccount));
+            return ResponseEntity.created(uri).body(updatedAccount);
         }).orElseThrow(() -> new AccountNotFoundException(id));
     }
 
@@ -98,6 +93,13 @@ public class AccountController {
         logger.info("Account not found: id = " + e.getAccountId());
         return new ResponseEntity<>(new VndErrors.VndError("Account ID: " + e.getAccountId(), e.getMessage(),
                 new Link(ServletUriComponentsBuilder.fromCurrentRequest().toUriString())), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<VndErrors.VndError> constraintViolationError(DataIntegrityViolationException e) {
+        logger.info("Data Integrity Violation Exception: " + e.getMessage());
+        return new ResponseEntity<>(new VndErrors.VndError("Data Integrity Violation Exception. Possible key duplicate.", e.getMessage(),
+                new Link(ServletUriComponentsBuilder.fromCurrentRequest().toUriString())), HttpStatus.NOT_ACCEPTABLE);
     }
 
 }
