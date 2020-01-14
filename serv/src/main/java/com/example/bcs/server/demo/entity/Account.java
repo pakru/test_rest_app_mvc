@@ -30,6 +30,15 @@ public class Account {
     public Account() {
     }
 
+    public Account(Long id, String name, LocalDateTime createDateTime, String email, String phoneNumber, String address) {
+        this.id = id;
+        this.name = name;
+        this.createDateTime = createDateTime;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
+
     public Long getId() {
         return id;
     }

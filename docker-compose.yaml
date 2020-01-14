@@ -4,7 +4,7 @@ services:
   postgres-server:
     container_name: postgres-server-bcs-demo
     image: postgres:12.1-alpine
-    restart: always
+    restart: unless-stopped
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -13,6 +13,23 @@ services:
       POSTGRES_DB: bcs
     ports:
       - 5432:5432
+    networks:
+      - bcs-net
+
+  bcs-server:
+    container_name: bcs_server
+    image: bcs_server
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgres-server:5432/bcs
+    ports:
+      - 8090:8090
+    depends_on:
+      - postgres-server
+    networks:
+      - bcs-net
 
 volumes:
-    db-data:
+  db-data:
+
+networks:
+  bcs-net:
