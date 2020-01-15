@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class AppConfiguration {
 
         ObjectReader oReader = csvMapper.readerFor(CsvData.class).with(schema);
 
-        try (Reader reader = new FileReader(resourceLoader.getResource("classpath:data.csv").getFile())) {
+        try (Reader reader = new InputStreamReader(resourceLoader.getResource("classpath:data.csv").getInputStream())) {
             MappingIterator<CsvData> mi = oReader.readValues(reader);
             List<CsvData> dataList = mi.readAll();
             logger.info("Data: " + dataList);
