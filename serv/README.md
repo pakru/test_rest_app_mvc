@@ -11,7 +11,7 @@ mvn clean package
 ```
 После сборки в артефактах появляется готовое приложение и готовый docker-образ c этим приложением
 
-##Запуск
+## Запуск
 Запуск производится при помощи _docker-compose_, где параллельно запускается PostgreSQL с базой.
 ```bash
 docker-compose up
@@ -20,6 +20,6 @@ docker-compose up
 
 По умолчанию сервис доступен на порте 8090.
 
-##Swagger UI
+## Swagger UI
 Описание OpenAPI доступно по адресу:
 > <IP-адрес сервиса>:<port<port>>/swagger-ui.html
