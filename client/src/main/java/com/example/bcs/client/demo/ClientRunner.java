@@ -12,6 +12,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -53,10 +55,16 @@ public class ClientRunner implements ApplicationRunner {
                 .build();
         logger.info("Accounts URI: " + accountsUri);
 
-        listData.forEach(e -> {
-            ResponseEntity<CsvData> response = restTemplate.postForEntity(accountsUri, e, CsvData.class);
-            logger.info("Response: " + response);
-        });
-
+        for (CsvData data : listData) {
+            try {
+                ResponseEntity<CsvData> response = restTemplate.postForEntity(accountsUri, data, CsvData.class);
+                logger.info("Response: " + response);
+            } catch (ResourceAccessException ex) {
+                logger.error("Failed to POST data: " + data + "; Cause: " + ex.getMessage());
+                return;
+            } catch (HttpClientErrorException ex) {
+                logger.warn("Received error response on data: " + data + "; Code: " + ex.getStatusCode());
+            }
+        }
     }
 }
