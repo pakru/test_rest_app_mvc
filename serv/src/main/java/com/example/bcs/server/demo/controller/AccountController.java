@@ -33,7 +33,7 @@ public class AccountController {
     @Autowired
     private AccountConverter accountConverter;
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountConverter.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     @RequestMapping(method = RequestMethod.OPTIONS)
     ResponseEntity<?> getOptions() {

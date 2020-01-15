@@ -1,6 +1,7 @@
 package com.example.bcs.server.demo.controller;
 
 import com.example.bcs.server.demo.AppConfig;
+import com.example.bcs.server.demo.converter.AccountConverter;
 import com.example.bcs.server.demo.entity.Account;
 import com.example.bcs.server.demo.repository.AccountsRepo;
 import org.json.JSONArray;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AccountController.class)
-@ContextConfiguration(classes = {AppConfig.class})
+@ContextConfiguration(classes = {AppConfig.class, AccountController.class, AccountConverter.class})
 public class AccountControllerTest {
 
     @Autowired
@@ -38,15 +39,10 @@ public class AccountControllerTest {
     @MockBean
     private AccountsRepo accountsRepo;
 
-//    @MockBean
-//    private AccountConverter accountConverter;
-
     private LocalDateTime dateTime = LocalDateTime.now();
-
 
     @WithMockUser(username = "admin", password = "password")
     @Test
-    @Ignore
     public void getAllAccounts() throws Exception {
         JSONArray expectedJson = new JSONArray();
         expectedJson.put(new JSONObject()
@@ -77,7 +73,6 @@ public class AccountControllerTest {
 
     @WithMockUser(username = "admin", password = "password")
     @Test
-    @Ignore
     public void getAccountById() throws Exception {
         long requestId = 1;
 
@@ -101,7 +96,13 @@ public class AccountControllerTest {
     @Test
     @Ignore
     public void postNewAccount() throws Exception {
-        JSONObject accountJson = new JSONObject()
+        JSONObject postJson = new JSONObject()
+                .put("name", "Ben")
+                .put("email", "ben@mail.com")
+                .put("address", "NSK")
+                .put("phone_number", "79101002030");
+
+        JSONObject resultJson = new JSONObject()
                 .put("id", 1)
                 .put("name", "Ben")
                 .put("email", "ben@mail.com")
@@ -109,21 +110,14 @@ public class AccountControllerTest {
                 .put("created_at", dateTime)
                 .put("phone_number", "79101002030");
 
-        JSONObject postJson = new JSONObject()
-                .put("name", "Ben")
-                .put("email", "ben@mail.com")
-                .put("address", "NSK")
-                .put("phone_number", "79101002030");
+        Account newAccount = new Account(1L, "Ben", dateTime, "ben@mail.com", "79101002030", "NSK");
 
-
-        Account saveAccount = new Account(1L, "Ben", dateTime, "ben@mail.com", "79101002030", "NSK");
-
-        given(accountsRepo.save(saveAccount))
-                .willReturn(saveAccount);
+        given(accountsRepo.save(newAccount))
+                .willReturn(newAccount);
 
         mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(postJson.toString()))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(accountJson.toString()));
+                .andExpect(content().json(resultJson.toString()));
     }
 
 
